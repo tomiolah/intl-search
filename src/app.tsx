@@ -3,6 +3,7 @@ import Fuse from "fuse.js";
 import { ToastContainer, toast } from "react-toastify";
 
 import { ITranslationFile, useTranslationFile } from "./state";
+import useDebounce from "./use-debounce";
 
 export default function App() {
   const { translationFile, setTranslationFile } = useTranslationFile();
@@ -10,6 +11,8 @@ export default function App() {
   const uploadRef = useRef<HTMLInputElement>(null);
 
   const [query, setQuery] = useState<string | undefined>();
+
+  const debouncedQuery = useDebounce(query, 500);
 
   const entries = useMemo(
     () =>
@@ -28,11 +31,13 @@ export default function App() {
   );
 
   const filteredEntries = useMemo(() => {
-    if (!entries || !query || !fuseInstance) {
+    if (!entries || !debouncedQuery || !fuseInstance) {
       return undefined;
     }
-    return fuseInstance.search(query).map((queryResult) => queryResult.item);
-  }, [entries, query, fuseInstance]);
+    return fuseInstance
+      .search(debouncedQuery)
+      .map((queryResult) => queryResult.item);
+  }, [entries, debouncedQuery, fuseInstance]);
 
   const [selectedItem, setSelectedItem] = useState<
     { key: string; value: string } | undefined
