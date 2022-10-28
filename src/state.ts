@@ -1,10 +1,11 @@
-import { atom, useAtom } from "jotai";
+import { useAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 
 export type ITranslationFile = Record<string, string>;
 
-export const translationFileAtom = atom<ITranslationFile | undefined>(
-  undefined
-);
+export const translationFileAtom = atomWithStorage<
+  ITranslationFile | undefined
+>('translationFile', undefined);
 
 export const useTranslationFile = () => {
   const [translationFile, setTranslationFile] = useAtom(translationFileAtom);
